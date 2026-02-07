@@ -1,35 +1,48 @@
 import pygame
+from GameObject import GameObject
+from Components import SpriteRenderer
 
 class GameWorld:
 
     def __init__(self) -> None:
         pygame.init()
+        self._gameObjects = []
+        go = GameObject()
 
+        go.add_component(SpriteRenderer("player.png"))
+        self._gameObjects.append(go)
+        
         self._screen = pygame.display.set_mode((1280,1024))
         self._running = True
         self._clock = pygame.time.Clock()
 
-        self._sprite_image = pygame.image.load("assets\\player.png")
-        self._sprite = pygame.sprite.Sprite()
-        self._sprite.rect = self._sprite_image.get_rect()
+    @property
+    def screen(self):
+        return self._screen
 
     def awake(self):
-        pass
+        for gameObject in self._gameObjects[:]:
+            gameObject.awake(self)
 
     def start(self):
-        pass
+        for gameObject in self._gameObjects[:]:
+            gameObject.start()
 
     def update(self):
         while self._running:
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self._running = False
-            self._screen.fill("cornflowerblue")
 
-            self._screen.blit(self._sprite_image,self._sprite.rect)
+            self._screen.fill("cornflowerblue")
+            delta_time = self._clock.tick(60) / 1000.0
+
+            for gameObject in self._gameObjects[:]:
+                gameObject.update(delta_time)
 
             pygame.display.flip()
-            self._clock.tick(60)
+
         pygame.quit()
 
 gw = GameWorld()
