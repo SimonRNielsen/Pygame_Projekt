@@ -1,17 +1,32 @@
 import pygame
 from GameObject import GameObject
-from Components import SpriteRenderer
+from Components import SpriteRenderer, Animator
 
 class GameWorld:
 
     def __init__(self) -> None:
         pygame.init()
         self._gameObjects = []
-        go = GameObject()
 
+        go = GameObject(pygame.math.Vector2(0,0))
         go.add_component(SpriteRenderer("player.png"))
+        animator = go.add_component(Animator())
+        animator.add_animation("Idle", 
+                               "player02.png", 
+                               "player03.png", 
+                               "player04.png", 
+                               "player05.png", 
+                               "player06.png", 
+                               "player07.png", 
+                               "player08.png", 
+                               "player07.png", 
+                               "player06.png", 
+                               "player05.png", 
+                               "player04.png", 
+                               "player03.png",)
+        animator.play_animation("Idle")
         self._gameObjects.append(go)
-        
+
         self._screen = pygame.display.set_mode((1280,1024))
         self._running = True
         self._clock = pygame.time.Clock()

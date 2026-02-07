@@ -1,15 +1,24 @@
 import pygame
+from Components import Transform
 
 class GameObject:
 
-    def __init__(self) -> None:
+    def __init__(self,position) -> None:
         self._components = {}
+        self._transform = self.add_component(Transform(position))
+
+    @property
+    def transform(self):
+        return self._transform
 
     def add_component(self, component):
         component_name = component.__class__.__name__
         self._components[component_name] = component
         component.gameObject = self
         return component
+    
+    def get_component(self, component_name):
+        return self._components.get(component_name, None)
 
     def awake(self, game_world):
         for component in self._components.values():
