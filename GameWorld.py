@@ -27,7 +27,7 @@ class GameWorld:
         animator.play_animation("Idle")
         self._gameObjects.append(go)
 
-        self._screen = pygame.display.set_mode((1280,1024))
+        self._screen = pygame.display.set_mode((1280,720))
         self._running = True
         self._clock = pygame.time.Clock()
 
