@@ -2,6 +2,7 @@ import pygame
 from GameObject import GameObject
 from Components import SpriteRenderer, Animator
 from Player import Player
+from Builder import PlayerBuilder
 
 class GameWorld:
 
@@ -9,25 +10,10 @@ class GameWorld:
         pygame.init()
         self._gameObjects = []
 
-        go = GameObject(pygame.math.Vector2(0,0))
-        go.add_component(SpriteRenderer("player.png"))
-        go.add_component(Player())
-        animator = go.add_component(Animator())
-        animator.add_animation("Idle", 
-                               "player02.png", 
-                               "player03.png", 
-                               "player04.png", 
-                               "player05.png", 
-                               "player06.png", 
-                               "player07.png", 
-                               "player08.png", 
-                               "player07.png", 
-                               "player06.png", 
-                               "player05.png", 
-                               "player04.png", 
-                               "player03.png",)
-        animator.play_animation("Idle")
-        self._gameObjects.append(go)
+        builder = PlayerBuilder()
+        builder.build()
+        
+        self._gameObjects.append(builder.get_gameObject())
 
         self._screen = pygame.display.set_mode((1280,720))
         self._running = True
