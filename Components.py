@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 import pygame
-from Enums import Collisions
+from Enums import Collisions, Components, Collidable
 
 class Component(ABC):
 
@@ -112,7 +112,7 @@ class Animator(Component):
         self._current_animation = animation
 
     def awake(self, game_world):
-        self._sprite_renderer = self._gameObject.get_component("SpriteRenderer")
+        self._sprite_renderer = self._gameObject.get_component(Components.SPRITERENDERER.value)
 
     def start(self):
         pass
@@ -137,7 +137,12 @@ class Laser(Component):
         super().__init__()
 
     def awake(self, game_world):
-        pass
+        collider = self._gameObject.get_component(Components.COLLIDER.value)
+        collider.subscribe(Collisions.ENTER, self.on_collision_enter)
+        collider.subscribe(Collisions.EXIT, self.on_collision_exit)
+        collider.subscribe(Collisions.PIXEL_ENTER, self.on_pixel_collision_enter)
+        collider.subscribe(Collisions.PIXEL_EXIT, self.on_pixel_collision_exit)
+        self._gameObject._subtype = Collidable.LASER
 
     def start(self):
         pass
@@ -149,6 +154,21 @@ class Laser(Component):
 
         if self._gameObject.transform.position.y < 0:
             self._gameObject.destroy()
+
+    def on_collision_enter(self, other):
+        print(f"{__class__.__name__}: Collision enter")
+
+    def on_collision_exit(self, other):
+        print(f"{__class__.__name__}: Collision exit")
+
+    def on_pixel_collision_enter(self, other):
+        print(f"{__class__.__name__}: Pixel collision enter")
+        if other.gameObject._subtype is Collidable.ENEMY:
+            other.gameObject.destroy()
+            self._gameObject.destroy()
+
+    def on_pixel_collision_exit(self, other):
+        print(f"{__class__.__name__}: Pixel collision exit")
 
 class Collider(Component):
 
@@ -166,7 +186,7 @@ class Collider(Component):
         return self._sprite_mask
     
     def awake(self, game_world):
-        sr = self._gameObject.get_component("SpriteRenderer")
+        sr = self._gameObject.get_component(Components.SPRITERENDERER.value)
         self._collision_box = sr.sprite.rect
         self._sprite_mask = sr.sprite_mask
         game_world.colliders.append(self)

@@ -1,6 +1,6 @@
-from Components import Component, Laser, SpriteRenderer
+from Components import Component, Laser, SpriteRenderer, Collider
 from GameObject import GameObject
-from Enums import Collisions
+from Enums import Collisions, Components, Collidable
 import pygame
 
 class Player(Component):
@@ -9,16 +9,17 @@ class Player(Component):
         self._time_since_last_shot = 1
         self._shoot_delay = 1
         self._game_world = game_world
-        sr = self._gameObject.get_component("SpriteRenderer")
+        sr = self._gameObject.get_component(Components.SPRITERENDERER.value)
         self._screen_size = pygame.math.Vector2(game_world.screen.get_width(),game_world.screen.get_height())
         self._sprite_size = pygame.math.Vector2(sr.sprite_image.get_width(),sr.sprite_image.get_height())
         self._gameObject.transform.position.x = (self._screen_size.x/2) - (self._sprite_size.x/2)
         self._gameObject.transform.position.y = (self._screen_size.y) - (self._sprite_size.y)
-        collider = self._gameObject.get_component("Collider")
+        collider = self._gameObject.get_component(Components.COLLIDER.value)
         collider.subscribe(Collisions.ENTER, self.on_collision_enter)
         collider.subscribe(Collisions.EXIT, self.on_collision_exit)
         collider.subscribe(Collisions.PIXEL_ENTER, self.on_pixel_collision_enter)
         collider.subscribe(Collisions.PIXEL_EXIT, self.on_pixel_collision_exit)
+        self._gameObject._subtype = Collidable.PLAYER
 
     def start(self):
         pass
@@ -57,12 +58,16 @@ class Player(Component):
         elif self._gameObject.transform.position.y < 0:
             self._gameObject.transform.position.y = 0
 
+    @property
+    def subtype(self):
+        return self._subtype
 
     def shoot(self):
         if self._time_since_last_shot >= self._shoot_delay:
             projectile = GameObject(None)
             sr = projectile.add_component(SpriteRenderer("laser.png"))
             projectile.add_component(Laser())
+            projectile.add_component(Collider())
             projectile_position = pygame.math.Vector2(self._gameObject.transform.position.x+(self._sprite_size.x/2)-sr._sprite_image.get_width()/2,self._gameObject.transform.position.y-30)
             projectile.transform.position = projectile_position
             self._game_world.instantiate(projectile)
