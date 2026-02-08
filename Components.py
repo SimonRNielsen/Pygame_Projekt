@@ -154,6 +154,7 @@ class Collider(Component):
     def __init__(self) -> None:
         self._other_colliders = []
         self._other_masks = []
+        self._listeners = {}
 
     @property
     def collision_box(self):
@@ -198,22 +199,29 @@ class Collider(Component):
 
     def collision_enter(self, other):
         self._other_colliders.append(other)
-        print("Collision enter")
+        if "collision_enter" in self._listeners:
+            self._listeners["collision_enter"](other)
 
     def collision_exit(self, other):
         self._other_colliders.remove(other)
-        print("Collision exit")
+        if "collision_exit" in self._listeners:
+            self._listeners["collision_exit"](other)
 
     def pixel_collision_enter(self, other):
         self._other_masks.append(other)
-        print("Mask enter")
+        if "pixel_collision_enter" in self._listeners:
+            self._listeners["pixel_collision_enter"](other)
 
     def pixel_collision_exit(self, other):
         self._other_masks.remove(other)
-        print("Mask exit")
+        if "pixel_collision_exit" in self._listeners:
+            self._listeners["pixel_collision_exit"](other)
 
     def check_pixel_collision(self, collision_box1, collision_box2, mask1, mask2):
         offset_x = collision_box2.x - collision_box1.x
         offset_y = collision_box2.y - collision_box1.y
         
         return mask1.overlap(mask2, (offset_x, offset_y)) is not None
+    
+    def subscribe(self, service, method):
+        self._listeners[service] = method

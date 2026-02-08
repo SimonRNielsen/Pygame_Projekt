@@ -13,6 +13,11 @@ class Player(Component):
         self._sprite_size = pygame.math.Vector2(sr.sprite_image.get_width(),sr.sprite_image.get_height())
         self._gameObject.transform.position.x = (self._screen_size.x/2) - (self._sprite_size.x/2)
         self._gameObject.transform.position.y = (self._screen_size.y) - (self._sprite_size.y)
+        collider = self._gameObject.get_component("Collider")
+        collider.subscribe("collision_enter", self.on_collision_enter)
+        collider.subscribe("collision_exit", self.on_collision_exit)
+        collider.subscribe("pixel_collision_enter", self.on_pixel_collision_enter)
+        collider.subscribe("pixel_collision_exit", self.on_pixel_collision_exit)
 
     def start(self):
         pass
@@ -59,3 +64,15 @@ class Player(Component):
             projectile.transform.position = projectile_position
             self._game_world.instantiate(projectile)
             self._time_since_last_shot = 0
+
+    def on_collision_enter(self, other):
+        print(f"{__class__.__name__}: Collision enter")
+
+    def on_collision_exit(self, other):
+        print(f"{__class__.__name__}: Collision exit")
+
+    def on_pixel_collision_enter(self, other):
+        print(f"{__class__.__name__}: Pixel collision enter")
+
+    def on_pixel_collision_exit(self, other):
+        print(f"{__class__.__name__}: Pixel collision exit")

@@ -1,7 +1,4 @@
 import pygame
-from GameObject import GameObject
-from Components import SpriteRenderer, Animator
-from Player import Player
 from Builder import PlayerBuilder, EnemyBuilder
 
 class GameWorld:
