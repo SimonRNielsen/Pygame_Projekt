@@ -1,5 +1,6 @@
 from Components import Component, Laser, SpriteRenderer
 from GameObject import GameObject
+from Enums import Collisions
 import pygame
 
 class Player(Component):
@@ -14,10 +15,10 @@ class Player(Component):
         self._gameObject.transform.position.x = (self._screen_size.x/2) - (self._sprite_size.x/2)
         self._gameObject.transform.position.y = (self._screen_size.y) - (self._sprite_size.y)
         collider = self._gameObject.get_component("Collider")
-        collider.subscribe("collision_enter", self.on_collision_enter)
-        collider.subscribe("collision_exit", self.on_collision_exit)
-        collider.subscribe("pixel_collision_enter", self.on_pixel_collision_enter)
-        collider.subscribe("pixel_collision_exit", self.on_pixel_collision_exit)
+        collider.subscribe(Collisions.ENTER, self.on_collision_enter)
+        collider.subscribe(Collisions.EXIT, self.on_collision_exit)
+        collider.subscribe(Collisions.PIXEL_ENTER, self.on_pixel_collision_enter)
+        collider.subscribe(Collisions.PIXEL_EXIT, self.on_pixel_collision_exit)
 
     def start(self):
         pass

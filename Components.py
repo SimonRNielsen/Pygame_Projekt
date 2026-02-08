@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import pygame
+from Enums import Collisions
 
 class Component(ABC):
 
@@ -199,23 +200,23 @@ class Collider(Component):
 
     def collision_enter(self, other):
         self._other_colliders.append(other)
-        if "collision_enter" in self._listeners:
-            self._listeners["collision_enter"](other)
+        if Collisions.ENTER in self._listeners:
+            self._listeners[Collisions.ENTER](other)
 
     def collision_exit(self, other):
         self._other_colliders.remove(other)
-        if "collision_exit" in self._listeners:
-            self._listeners["collision_exit"](other)
+        if Collisions.EXIT in self._listeners:
+            self._listeners[Collisions.EXIT](other)
 
     def pixel_collision_enter(self, other):
         self._other_masks.append(other)
-        if "pixel_collision_enter" in self._listeners:
-            self._listeners["pixel_collision_enter"](other)
+        if Collisions.PIXEL_ENTER in self._listeners:
+            self._listeners[Collisions.PIXEL_ENTER](other)
 
     def pixel_collision_exit(self, other):
         self._other_masks.remove(other)
-        if "pixel_collision_exit" in self._listeners:
-            self._listeners["pixel_collision_exit"](other)
+        if Collisions.PIXEL_EXIT in self._listeners:
+            self._listeners[Collisions.PIXEL_EXIT](other)
 
     def check_pixel_collision(self, collision_box1, collision_box2, mask1, mask2):
         offset_x = collision_box2.x - collision_box1.x
