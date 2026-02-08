@@ -2,17 +2,21 @@ import pygame
 from GameObject import GameObject
 from Components import SpriteRenderer, Animator
 from Player import Player
-from Builder import PlayerBuilder
+from Builder import PlayerBuilder, EnemyBuilder
 
 class GameWorld:
 
     def __init__(self) -> None:
         pygame.init()
         self._gameObjects = []
+        self._colliders = []
 
         builder = PlayerBuilder()
         builder.build()
+        self._gameObjects.append(builder.get_gameObject())
         
+        builder = EnemyBuilder()
+        builder.build()
         self._gameObjects.append(builder.get_gameObject())
 
         self._screen = pygame.display.set_mode((1280,720))
@@ -22,6 +26,10 @@ class GameWorld:
     @property
     def screen(self):
         return self._screen
+    
+    @property
+    def colliders(self):
+        return self._colliders
     
     def instantiate(self, gameObject):
         gameObject.awake(self)
@@ -48,6 +56,11 @@ class GameWorld:
 
             for gameObject in self._gameObjects[:]:
                 gameObject.update(delta_time)
+
+            for i, collider1 in enumerate(self._colliders):
+                for j in range(i+1, len(self._colliders)):
+                    collider2 = self._colliders[j]
+                    collider1.collision_check(collider2)
 
             self._gameObjects = [obj for obj in self._gameObjects if not obj.is_destroyed]
 

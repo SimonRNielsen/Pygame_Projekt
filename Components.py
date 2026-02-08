@@ -61,6 +61,7 @@ class SpriteRenderer(Component):
         self._sprite_image = pygame.image.load(f"assets\\{sprite_name}")
         self._sprite = pygame.sprite.Sprite()
         self._sprite.rect = self._sprite_image.get_rect()
+        self._sprite_mask = pygame.mask.from_surface(self.sprite_image)
 
     @property
     def sprite_image(self):
@@ -69,6 +70,14 @@ class SpriteRenderer(Component):
     @sprite_image.setter
     def sprite_image(self, value):
         self._sprite_image = value
+
+    @property
+    def sprite(self):
+        return self._sprite
+    
+    @property
+    def sprite_mask(self):
+        return self._sprite_mask
 
     def awake(self, game_world):
         self._game_world = game_world
@@ -139,3 +148,72 @@ class Laser(Component):
 
         if self._gameObject.transform.position.y < 0:
             self._gameObject.destroy()
+
+class Collider(Component):
+
+    def __init__(self) -> None:
+        self._other_colliders = []
+        self._other_masks = []
+
+    @property
+    def collision_box(self):
+        return self._collision_box
+    
+    @property
+    def sprite_mask(self):
+        return self._sprite_mask
+    
+    def awake(self, game_world):
+        sr = self._gameObject.get_component("SpriteRenderer")
+        self._collision_box = sr.sprite.rect
+        self._sprite_mask = sr.sprite_mask
+        game_world.colliders.append(self)
+
+    def start(self):
+        pass
+
+    def update(self, delta_time):
+        pass
+
+    def collision_check(self, other):
+        is_rect_colliding = self._collision_box.colliderect(other._collision_box)
+        is_already_colliding = other in self._other_colliders
+
+        if is_rect_colliding:
+            if not is_already_colliding:
+                self.collision_enter(other)
+                other.collision_enter(self)
+            if self.check_pixel_collision(self._collision_box, other.collision_box, self._sprite_mask, other.sprite_mask):
+                if other not in self._other_masks:
+                    self.pixel_collision_enter(other)
+                    other.pixel_collision_enter(self)
+            else:
+                if other in self._other_masks:
+                    self.pixel_collision_exit(other)
+                    other.pixel_collision_exit(self)
+        else:
+            if is_already_colliding:
+                self.collision_exit(other)
+                other.collision_exit(self)
+
+    def collision_enter(self, other):
+        self._other_colliders.append(other)
+        print("Collision enter")
+
+    def collision_exit(self, other):
+        self._other_colliders.remove(other)
+        print("Collision exit")
+
+    def pixel_collision_enter(self, other):
+        self._other_masks.append(other)
+        print("Mask enter")
+
+    def pixel_collision_exit(self, other):
+        self._other_masks.remove(other)
+        print("Mask exit")
+
+    def check_pixel_collision(self, collision_box1, collision_box2, mask1, mask2):
+        offset_x = collision_box2.x - collision_box1.x
+        offset_y = collision_box2.y - collision_box1.y
+        
+        return mask1.overlap(mask2, (offset_x, offset_y)) is not None
