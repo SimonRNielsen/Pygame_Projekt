@@ -1,6 +1,7 @@
 import pygame
 from GameObject import GameObject
 from Components import SpriteRenderer, Animator
+from Player import Player
 
 class GameWorld:
 
@@ -10,6 +11,7 @@ class GameWorld:
 
         go = GameObject(pygame.math.Vector2(0,0))
         go.add_component(SpriteRenderer("player.png"))
+        go.add_component(Player())
         animator = go.add_component(Animator())
         animator.add_animation("Idle", 
                                "player02.png", 
@@ -34,6 +36,11 @@ class GameWorld:
     @property
     def screen(self):
         return self._screen
+    
+    def instantiate(self, gameObject):
+        gameObject.awake(self)
+        gameObject.start()
+        self._gameObjects.append(gameObject)
 
     def awake(self):
         for gameObject in self._gameObjects[:]:
@@ -55,6 +62,8 @@ class GameWorld:
 
             for gameObject in self._gameObjects[:]:
                 gameObject.update(delta_time)
+
+            self._gameObjects = [obj for obj in self._gameObjects if not obj.is_destroyed]
 
             pygame.display.flip()
 

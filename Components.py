@@ -120,3 +120,22 @@ class Animator(Component):
                 self._current_frame_index = 0
 
             self._sprite_renderer.sprite_image = animation_sequence[self._current_frame_index]
+
+class Laser(Component):
+
+    def __init__(self):
+        super().__init__()
+
+    def awake(self, game_world):
+        pass
+
+    def start(self):
+        pass
+
+    def update(self, delta_time):
+        speed = 500
+        movement = pygame.math.Vector2(0, -speed)
+        self._gameObject.transform.translate(movement*delta_time)
+
+        if self._gameObject.transform.position.y < 0:
+            self._gameObject.destroy()
