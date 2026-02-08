@@ -36,6 +36,8 @@ class Player(Component):
             movement.y += speed
         if keys[pygame.K_d]:
             movement.x += speed
+        if keys[pygame.K_ESCAPE]:
+            pygame.event.post(pygame.event.Event(pygame.QUIT))
 
         if keys[pygame.K_SPACE]:
             self.shoot()
